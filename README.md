@@ -1,2 +1,4 @@
 # simple-mdb-js-website
-Simple website with MDB api connection on JS
+Простое подключение к MDB на чистом JS
+
+Для работы сайта, замените "YOUR_KEY_HERE" в файле script.js на ваш apikey, полученный на MDB.
