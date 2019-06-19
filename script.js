@@ -8,26 +8,10 @@ function apiSearch(event) {
     event.preventDefault();
     const searchText = document.querySelector('#search-input').value;
     const server = 'https://api.themoviedb.org/3/search/multi?api_key=' + apiKey + '&language=ru&query=' + searchText;
-    requestApi('GET', server);
-}
-
-searchForm.addEventListener('submit', apiSearch);
-
-function requestApi(method, url) {
-    const request = new XMLHttpRequest();
-    request.open(method, url);
-    request.send();
-    request.addEventListener('readystatechange', () => {
-            if (request.readyState !== 4) {
-                return;
-            }
-
-            if (request.status !== 200) {
-                console.log('error: ' + request.status);
-                return;
-            }
-
-            const output = JSON.parse(request.responseText);
+    movie.innerHTML = 'Загрузка';
+    requestApi('GET', server)
+        .then((result) => {
+            const output = JSON.parse(result);
 
             let inner = '';
 
@@ -38,6 +22,39 @@ function requestApi(method, url) {
             });
 
             movie.innerHTML = inner;
-        }
-    );
+        })
+        .catch((reason) => {
+            movie.innerHTML = 'Упс, что-то пошло не так!';
+                console.log('error: ' + reason);
+                return;
+        })
+        ;
+}
+
+searchForm.addEventListener('submit', apiSearch);
+
+function requestApi(method, url) {
+    return new Promise ((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open(method, url);
+
+        request.addEventListener('load', ()=>{
+            if (request.status !== 200) {
+                reject({
+                    status: request.status
+                });
+                return;
+            }
+
+            resolve(request.response);
+        });
+
+        request.addEventListener('error', ()=>{
+            reject({
+                status: request.status
+            });
+        });
+
+        request.send();
+    });
 }
