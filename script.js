@@ -9,10 +9,12 @@ function apiSearch(event) {
     const searchText = document.querySelector('#search-input').value;
     const server = 'https://api.themoviedb.org/3/search/multi?api_key=' + apiKey + '&language=ru&query=' + searchText;
     movie.innerHTML = 'Загрузка';
-    requestApi('GET', server)
-        .then((result) => {
-            const output = JSON.parse(result);
 
+    fetch(server)
+        .then((value) => {
+            return value.json();
+        })
+        .then((output) => {
             let inner = '';
 
             output.results.forEach(function (item) {
@@ -32,29 +34,3 @@ function apiSearch(event) {
 }
 
 searchForm.addEventListener('submit', apiSearch);
-
-function requestApi(method, url) {
-    return new Promise ((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open(method, url);
-
-        request.addEventListener('load', ()=>{
-            if (request.status !== 200) {
-                reject({
-                    status: request.status
-                });
-                return;
-            }
-
-            resolve(request.response);
-        });
-
-        request.addEventListener('error', ()=>{
-            reject({
-                status: request.status
-            });
-        });
-
-        request.send();
-    });
-}
